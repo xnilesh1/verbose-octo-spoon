@@ -5,7 +5,6 @@ from pydantic import BaseModel
 from typing import List, Dict, Tuple
 from dotenv import load_dotenv
 import gc
-import streamlit as st
 
 
 load_dotenv()
