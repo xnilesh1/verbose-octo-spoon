@@ -1,4 +1,3 @@
-import streamlit as st
 from queryv import execute_query_acts, execute_query_laws
 # Function schemas for the Gemini model, defined as dictionaries
 query_acts_schema = {
