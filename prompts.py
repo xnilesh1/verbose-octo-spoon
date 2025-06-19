@@ -47,7 +47,8 @@ markdown**[YES/NO/PARTIALLY] - [Brief direct answer]**
 [Relevant acts and sections]
 
 ### Case Precedents
-[Relevant cases if applicable]
+[Relevant case names if applicable]
+IT's IMPORTANT TO PROVIDE CASE NAMES AND ONE LINER SUMMARY.
 
 ### Practical Steps
 [Actionable guidance when helpful]
@@ -70,8 +71,9 @@ markdown### Overview
 ### Sources
 [Citations]
 For Procedural Questions:
-markdown### Process Overview
-[Brief description of the procedure]
+
+### Making a case
+[Brief description of the actionable steps in procedure]
 
 ### Required Steps
 [Detailed step-by-step process]
