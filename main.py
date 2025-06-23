@@ -52,6 +52,10 @@ class ChatRequest(BaseModel):
         description="Unique session ID for the chat. A new one is created if not provided.",
     )
     question: str = Field(..., description="The question from the user.")
+    model: str = Field(
+        "gemini-1.5-flash",
+        description="The model to use for the chat.",
+    )
     max_token: int = Field(2048, description="Maximum tokens for the response.")
     top_p: Optional[int] = Field(
         None,
@@ -84,10 +88,30 @@ model = genai.GenerativeModel(
 # In-memory store for chat sessions
 chat_sessions: Dict[str, Any] = {}
 
-def get_chat_session(session_id: str):
+def get_chat_session(session_id: str, model_name: str = "gemini-1.5-flash"):
     if session_id not in chat_sessions:
-        chat_sessions[session_id] = model.start_chat(history=[])
-    return chat_sessions[session_id]
+        # New session, create model and chat
+        active_model = genai.GenerativeModel(
+            model_name=model_name,
+            system_instruction=system_prompt,
+            tools=legal_tools
+        )
+        chat_sessions[session_id] = {"model_name": model_name, "chat": active_model.start_chat(history=[])}
+
+    session = chat_sessions[session_id]
+
+    if session["model_name"] != model_name:
+        # Model has changed. Create new chat, history from previous model is lost for this session.
+        # We can take the history from old chat and pass to new one.
+        old_history = session["chat"].history
+        active_model = genai.GenerativeModel(
+            model_name=model_name,
+            system_instruction=system_prompt,
+            tools=legal_tools
+        )
+        chat_sessions[session_id] = {"model_name": model_name, "chat": active_model.start_chat(history=old_history)}
+
+    return chat_sessions[session_id]["chat"]
 
 # --- API Endpoint ---
 @app.post("/chat", response_model=ChatResponse, dependencies=[Depends(get_api_key)])
@@ -107,7 +131,7 @@ async def chat_with_bot(request: ChatRequest):
     total_candidates_tokens = 0
 
     try:
-        chat = get_chat_session(request.session_id)
+        chat = get_chat_session(request.session_id, request.model)
 
         # Truncate history based on top_p before sending the new message
         if top_p is not None:
@@ -120,15 +144,6 @@ async def chat_with_bot(request: ChatRequest):
                 # Clear history if top_p is 0
                 chat.history = []
         
-        # Set max_token for this specific call if provided
-        # Note: The underlying google-generativeai library might handle token limits differently.
-        # Here we adjust the generation_config for the model for this request.
-        # A more direct way is not available in send_message.
-        # This setting on the model is not thread-safe if applied directly.
-        # For this use case, we will rely on the default model setting,
-        # as per-request token limit is complex to manage this way.
-        # The `max_token` from request is noted, but not directly applied here
-        # due to library limitations in `send_message`. A different model setup would be needed.
 
         generation_config = genai_types.GenerationConfig(
             max_output_tokens=request.max_token
