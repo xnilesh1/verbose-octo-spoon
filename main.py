@@ -79,7 +79,7 @@ generation_config = genai_types.GenerationConfig(
 )
 
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",  # Using 1.5 flash as it's generally better
+    model_name="gemini-2.0-flash",  # Using 1.5 flash as it's generally better
     system_instruction=system_prompt,
     tools=legal_tools,
     generation_config=generation_config,
@@ -88,7 +88,7 @@ model = genai.GenerativeModel(
 # In-memory store for chat sessions
 chat_sessions: Dict[str, Any] = {}
 
-def get_chat_session(session_id: str, model_name: str = "gemini-1.5-flash"):
+def get_chat_session(session_id: str, model_name: str = "gemini-2.0-flash"):
     if session_id not in chat_sessions:
         # New session, create model and chat
         active_model = genai.GenerativeModel(
