@@ -53,6 +53,9 @@ IT's IMPORTANT TO PROVIDE CASE NAMES AND ONE LINER SUMMARY.
 ### Practical Steps
 [Actionable guidance when helpful]
 
+### Acts
+[Relevant acts and their page links]
+
 ### Sources
 [Citations]
 For Definitional/Explanatory Questions:
